@@ -16,6 +16,7 @@ public class Model {
 	private SimpleWeightedGraph<String,DefaultWeightedEdge> grafo;
 	private Map<String,String> tipi;
 	private FoodDao dao;
+	private List<Vicino> migliore;
 	
 	public Model() {
 		this.dao=new FoodDao();
@@ -45,7 +46,70 @@ public class Model {
 		
 		
 	}
+	
+	public List<Vicino> cercaCammino(int n,String s){
+		this.migliore=new ArrayList<>();
+		
+		List<Vicino> parziale=new ArrayList<>();
+		
+		Vicino v=new Vicino(s,0.0);
+		parziale.add(v);
+		
+		this.cerca(parziale,n);
+		return migliore;
+		
+	}
+	
+	
+	
 
+	private void cerca(List<Vicino> parziale, int n) {
+		if(parziale.size()==n) {
+			if(this.calcolaPeso(parziale)>this.calcolaPeso(migliore)) {
+				migliore=new ArrayList<>(parziale);
+				return;
+			}
+		}
+		else {
+			for(Vicino v:this.calcolaPossibili(parziale, parziale.get(parziale.size()-1))) {
+				parziale.add(v);
+				this.cerca(parziale, n);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+		
+	}
+	
+	
+	
+	public double calcolaPeso(List<Vicino> parziale) {
+		double peso=0.0;
+		for(Vicino v: parziale) {
+			peso+=v.getPeso();
+		}
+		return peso;
+	}
+	
+	private List<Vicino> calcolaPossibili(List<Vicino> parziale,Vicino v){
+		List<Vicino> ritorno=this.connessi(v.getN());
+		List<Vicino> possibili=new ArrayList<>();
+		for(Vicino vi:ritorno) {
+			int t=0;
+			for(Vicino vv:parziale) {
+				if(vi.getN().compareTo(vv.getN())==0)
+					t=1;
+			}
+		    if(t==0)
+		    	possibili.add(vi);
+		}
+		return possibili;
+		}
+
+		
+	
+	
+	
+	
 	public SimpleWeightedGraph<String, DefaultWeightedEdge> getGrafo() {
 		return grafo;
 	}

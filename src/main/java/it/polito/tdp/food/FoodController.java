@@ -51,6 +51,20 @@ public class FoodController {
     void doCammino(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Cerco cammino peso massimo...");
+    	int x;
+        try {
+        	x=Integer.parseInt(txtPassi.getText());
+        	
+        }
+        catch(NumberFormatException e) {
+        	txtResult.appendText("Inserire valore numerico");
+        	return;
+        }
+        List<Vicino> cammino=new ArrayList<>(this.model.cercaCammino(x, boxPorzioni.getValue()));
+        for(Vicino v: cammino) {
+        	txtResult.appendText("\n"+v.getN());
+        }
+        txtResult.appendText("\nPeso totale: "+this.model.calcolaPeso(cammino));
     }
 
     @FXML
