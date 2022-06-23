@@ -1,12 +1,14 @@
-/**
- * Sample Skeleton for 'Food.fxml' Controller Class
- */
-
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Vicino;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,7 +42,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -55,6 +57,15 @@ public class FoodController {
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Cerco porzioni correlate...");
+    	if(this.model.getGrafo()==null||boxPorzioni.getValue()==null) {
+    		txtResult.appendText("\nCreare grafo e selezionare tipo porzione");
+    	}
+    	else {
+    		List<Vicino> vicini=this.model.connessi(boxPorzioni.getValue());
+    		for(Vicino v:vicini) {
+    			txtResult.appendText("\n Tipo: "+v.getN()+" peso: "+v.getPeso());
+    		}
+    	}
     	
     }
 
@@ -62,7 +73,24 @@ public class FoodController {
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Creazione grafo...");
-    	
+    	int x;
+        try {
+        	x=Integer.parseInt(txtCalorie.getText());
+        	
+        }
+        catch(NumberFormatException e) {
+        	txtResult.appendText("Inserire valore numerico");
+        	return;
+        }
+        this.model.creaGrafo( Integer.parseInt(txtCalorie.getText()));
+        txtResult.setText("Vertici: "+this.model.getGrafo().vertexSet().size()+"  Archi"+this.model.getGrafo().edgeSet().size());
+        List<String> nomi=new ArrayList<String>();
+        for(String s:this.model.getGrafo().vertexSet())
+        		nomi.add(s);
+        Collections.sort(nomi);
+    	for(String s:nomi ) {
+    		boxPorzioni.getItems().add(s);
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
